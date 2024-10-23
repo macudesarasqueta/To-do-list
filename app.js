@@ -3,6 +3,8 @@ alert("Bienvenido!! Aqui te ayudaremos a planificar tu semana");
 const tareas = [];
 
 function mostrarListaTareas(tareas) {
+    const diasOrden = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
+    tareas.sort((a, b) => diasOrden.indexOf(a.fecha) - diasOrden.indexOf(b.fecha));
     listaTareas = "Lista de tareas:\n";
     tareas.forEach((tarea, index) => {
         listaTareas += `${index +1}. ${tarea.fecha} -> ${tarea.task}\n`;
@@ -16,7 +18,7 @@ function tareaNueva(tareas) {
         alert("No has escrito ninguna tarea, vuelve a intentarlo");
         tarea = prompt ("Indica la tarea que quieres agregar");
     }
-    let dia = prompt("Indica cuando quieres realizar esa tarea: Lunes (L)/ Martes (M)/ Miercoles (X)/ Jueves (J)/ Viernes (V)/ Sabado (S)/ Domingo (D)/ Esta semana (ES)");
+    let dia = prompt("Indica cuando quieres realizar esa tarea: Lunes (L)/ Martes (M)/ Miercoles (X)/ Jueves (J)/ Viernes (V)/ Sabado (S)/ Domingo (D)");
     while (true) {
         if (dia === "L" || dia === "l") {
             dia = "lunes";
@@ -61,7 +63,7 @@ let listaTareas = "Lista de tareas:\nNinguna tarea agregada\n";
 
 function inicioListaTareas(tareas) {
     let continuar = prompt(`${listaTareas}\nQuieres agregar tareas? Si/No`);
-    if (continuar === "SI" || continuar === "si" || continuar === "SI")
+    if (continuar === "Si" || continuar === "si" || continuar === "SI")
         tareaNueva(tareas);
     else if (continuar === "No" || continuar === "no" || continuar === "NO") {
         let VerListaTareas = prompt("Quieres ver la lista de tareas? Si/No");
