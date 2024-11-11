@@ -1,9 +1,14 @@
+/* body {
+    background: black;
+} */
+
 .form {
     margin: 10px;
     padding: 10px;
 }
 
 .title {
+    /* color: white; */
     margin: 40px;
     padding: auto;
     text-align: center;
@@ -14,6 +19,7 @@
 }
 
 .footer {
+    /* color: white; */
     text-align: center;
     padding: 20px 0;
 }

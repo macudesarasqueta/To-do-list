@@ -8,9 +8,15 @@ const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 let nextId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
 
+const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
 const renderizarTareas = () => {
     taskList.innerHTML = "";
   
+    tasks.sort((a, b) => {
+        return daysOfWeek.indexOf(a.inputDay) - daysOfWeek.indexOf(b.inputDay);
+    });
+
     tasks.forEach((task) => {
         //Creacion del contenedor li
         const itemTask = document.createElement("li");
@@ -34,35 +40,69 @@ const renderizarTareas = () => {
         buttonDelete.textContent = "Eliminar";
         buttonDelete.classList.add("btn", "btn-danger", "btn-sm");
         buttonDelete.style.width = "auto";
-        buttonDelete.addEventListener("click", () => deleteTask(task.id));
+        buttonDelete.addEventListener("click", (event) => {
+            event.preventDefault();
+            Swal.fire({
+                title: "¿Estás seguro que quieres eliminar la tarea?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteTask(task.id); 
+                    Swal.fire({
+                        title: "¡Tarea eliminada!",
+                        icon: "success"
+                    });
+                }
+            });
+        });
 
         //Añadir elementos al li
         itemTask.append(checkbox);
         itemTask.append(infoTask);
         itemTask.append(buttonDelete);
         taskList.append(itemTask);
-  });
-  showPendingTask();
+    });
+    showPendingTask();
 };
 
 const addTasks = () => {
+    // console.log("ingresa a addTask");
     const name = inputTask.value.trim();
     const day = inputDay.value;
 
-    if (name && day) {
-        tasks.push({
-            id: nextId++,
-            inputDay: day,
-            infoTask: name,
-            completed: false,
+    if (!name || !day) {
+        Swal.fire({
+            title: "Por favor rellena todos los campos",
+            icon: "error",
+        })
+        return;
+    };
+    // Verifica si ya existe una tarea en ese día con el mismo nombre
+    const existingTask = tasks.find(task => task.inputDay === day && task.infoTask === name);
+    if (existingTask) {
+        Swal.fire({
+            title: "Tarea duplicada",
+            text: "Ya existe una tarea para este día con el mismo nombre.",
+            icon: "warning",
+            confirmButtonText: "Aceptar"
         });
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-        renderizarTareas();
-        inputDay.value = ""; // Limpiar el campo de selección después de agregar la tarea
-        inputTask.value = ""; // Limpiar el campo de entrada después de agregar la tarea
-    } else {
-        alert("Por favor, rellena todos los campos");
-    }
+        return; // Detener la ejecución para evitar que la tarea se agregue
+    };
+    const newTask = {
+        id: nextId++,
+        inputDay: day,
+        infoTask: name,
+        completed: false,
+    };
+    tasks.push(newTask);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    renderizarTareas();
+    inputDay.value = ""; // Limpiar el campo de selección después de agregar la tarea
+    inputTask.value = ""; // Limpiar el campo de entrada después de agregar la tarea
 };
 
 const deleteTask = (id) => {
@@ -78,21 +118,42 @@ const deleteTask = (id) => {
 const showPendingTask = () => {
     const pendientes = tasks.filter((task) => !task.completed).length;
     pendingTask.textContent = `Tareas pendientes: ${pendientes}`;
-  };
+};
   
 const markAsCompleted = (checkbox, id) => {
     const task = tasks.find((task) => task.id === id);
   
     if (task) {
-      task.completed = checkbox.checked;
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      renderizarTareas();
-    }
+        if (checkbox.checked) {
+            // Mostrar Toastify cuando la tarea se marca como realizada
+            Toastify({
+                text: "Has marcado la tarea como realizada",
+                className: "success",
+                duration: 2000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                }
+            }).showToast();
+        } else {
+            // Mostrar Toastify cuando la tarea se desmarca como pendiente
+            Toastify({
+                text: "Has marcado la tarea como pendiente",
+                className: "warning",
+                duration: 2000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                }
+            }).showToast();
+        };
+    };
 };
   
 renderizarTareas();
-//addTaskButton.addEventListener("click", addTasks);
 addTaskButton.addEventListener("click", (event) => {
     event.preventDefault(); // Evita que el formulario recargue la página
-    addTasks(); // Llama a tu función para agregar tareas
+    addTasks();
 });
