@@ -67,7 +67,6 @@ const renderizarTareas = () => {
         itemTask.append(checkbox);
         itemTask.append(infoTask);
         itemTask.append(buttonDelete);
-        // taskList.append(itemTask);
         
         if (task.completed) {
             completedTaskList.append(itemTask);
@@ -142,8 +141,7 @@ const markAsCompleted = (checkbox, id) => {
         if (checkbox.checked) {
             task.completed = checkbox.checked;
             localStorage.setItem("tasks", JSON.stringify(tasks));
-            renderizarTareas();
-            // Mostrar Toastify cuando la tarea se marca como realizada
+            
             Toastify({
                 text: "Has marcado la tarea como realizada",
                 className: "success",
@@ -155,7 +153,9 @@ const markAsCompleted = (checkbox, id) => {
                 }
             }).showToast();
         } else {
-            // Mostrar Toastify cuando la tarea se desmarca como pendiente
+            task.completed = false;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            
             Toastify({
                 text: "Has marcado la tarea como pendiente",
                 className: "warning",
@@ -168,6 +168,7 @@ const markAsCompleted = (checkbox, id) => {
             }).showToast();
         };
     };
+    renderizarTareas();
 };
   
 renderizarTareas();
