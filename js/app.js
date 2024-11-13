@@ -12,7 +12,10 @@ const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábad
 
 const renderizarTareas = () => {
     taskList.innerHTML = "";
-  
+
+    const completedTaskList = document.getElementById("completedTaskList");
+    completedTaskList.innerHTML = "";
+
     tasks.sort((a, b) => {
         return daysOfWeek.indexOf(a.inputDay) - daysOfWeek.indexOf(b.inputDay);
     });
@@ -32,7 +35,7 @@ const renderizarTareas = () => {
         //Creacion del texto de la tarea
         const infoTask = document.createElement("span");
         infoTask.innerHTML = `
-            <strong>Día: ${task.inputDay} --> ${task.infoTask}</strong>
+            <strong>${task.inputDay} <i class="bi bi-arrow-right-circle-fill"></i> ${task.infoTask}</strong>
         `;
 
         //Creacion del boton eliminar
@@ -64,8 +67,15 @@ const renderizarTareas = () => {
         itemTask.append(checkbox);
         itemTask.append(infoTask);
         itemTask.append(buttonDelete);
-        taskList.append(itemTask);
+        // taskList.append(itemTask);
+        
+        if (task.completed) {
+            completedTaskList.append(itemTask);
+        } else {
+            taskList.append(itemTask);
+        }
     });
+
     showPendingTask();
 };
 
@@ -118,6 +128,11 @@ const deleteTask = (id) => {
 const showPendingTask = () => {
     const pendientes = tasks.filter((task) => !task.completed).length;
     pendingTask.textContent = `Tareas pendientes: ${pendientes}`;
+
+    const completed = tasks.filter((task) => task.completed).length;
+    
+    const completedTaskHeader = document.getElementById("completedTask");
+    completedTaskHeader.textContent = `Tareas realizadas: ${completed}`;
 };
   
 const markAsCompleted = (checkbox, id) => {
@@ -125,6 +140,9 @@ const markAsCompleted = (checkbox, id) => {
   
     if (task) {
         if (checkbox.checked) {
+            task.completed = checkbox.checked;
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            renderizarTareas();
             // Mostrar Toastify cuando la tarea se marca como realizada
             Toastify({
                 text: "Has marcado la tarea como realizada",
