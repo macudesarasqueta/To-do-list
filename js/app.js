@@ -75,11 +75,38 @@ const renderizarTareas = () => {
         }
     });
 
+    const buttonDeleteEverything = document.createElement("button");
+    buttonDeleteEverything.textContent = "Eliminar todo";
+    buttonDeleteEverything.classList.add("btn", "btn-danger", "btn-sm");
+    buttonDeleteEverything.style.width = "auto";
+    buttonDeleteEverything.addEventListener("click", (event) => {
+        event.preventDefault();
+        Swal.fire({
+            title: "¿Estás seguro que quieres eliminar todas las tareas realizadas?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Eliminar todo",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            //tasks.filter(task => task.completed)
+            if (result.isConfirmed) {
+                const tareasRestantes = tasks.filter(task => !task.completed);
+            tasks.length = 0;
+            tasks.push(...tareasRestantes); // Rellenar con las tareas no completadas
+            localStorage.setItem("tasks", JSON.stringify(tasks)); // Actualizar en localStorage
+            
+            renderizarTareas(); // Renderizar lista actualizada
+            }
+        })
+    });
+
     showPendingTask();
+    completedTaskList.append(buttonDeleteEverything);
 };
 
 const addTasks = () => {
-    // console.log("ingresa a addTask");
     const name = inputTask.value.trim();
     const day = inputDay.value;
 
