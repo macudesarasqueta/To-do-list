@@ -48,7 +48,6 @@ const renderizarTareas = () => {
             <strong>${task.inputDay} <i class="bi bi-arrow-right-circle-fill"></i> ${task.infoTask}</strong>
         `;
         } 
-        
 
         //Creacion del boton eliminar
         const buttonDelete = document.createElement("button");
@@ -107,10 +106,15 @@ const renderizarTareas = () => {
             confirmButtonText: "Eliminar todo",
         }).then((result) => {
             if (result.isConfirmed) {
-                const tareasRestantes = tasks.filter(task => !task.completed);
+                // Filtrar las tareas no completadas y reasignar al array tasks
+                const remainingTasks = tasks.filter(task => !task.completed);
                 tasks.length = 0;
-                tasks.push(...tareasRestantes); // Rellenar con las tareas no completadas
-                localStorage.setItem("tasks", JSON.stringify(tasks)); // Actualizar en localStorage
+                tasks.push(...remainingTasks); // Agregar solo las tareas no completadas
+            
+                // Actualizar el almacenamiento local y la interfaz
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+                renderizarTareas();
+
                 Toastify({
                     text: "Has eliminado todas las tareas realizadas",
                     className: "success",
