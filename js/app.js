@@ -1,5 +1,6 @@
 const inputTask = document.getElementById("inputTask");
 const inputDay = document.getElementById("inputDay");
+const inputTime = document.getElementById("inputTime");
 const addTaskButton = document.getElementById("addTask");
 const taskList = document.getElementById("taskList");
 const pendingTask = document.getElementById("pendingTask");
@@ -17,7 +18,11 @@ const renderizarTareas = () => {
     completedTaskList.innerHTML = "";
 
     tasks.sort((a, b) => {
-        return daysOfWeek.indexOf(a.inputDay) - daysOfWeek.indexOf(b.inputDay);
+        const dayDifference = daysOfWeek.indexOf(a.inputDay) - daysOfWeek.indexOf(b.inputDay);
+        if (dayDifference === 0) {
+            return a.inputTime.localeCompare(b.inputTime);
+        }
+        return dayDifference;
     });
 
     tasks.forEach((task) => {
@@ -34,9 +39,16 @@ const renderizarTareas = () => {
 
         //Creacion del texto de la tarea
         const infoTask = document.createElement("span");
-        infoTask.innerHTML = `
+        if (task.inputTime){
+            infoTask.innerHTML = `
+            <strong>${task.inputDay} <i class="bi bi-arrow-right-circle-fill"></i> ${task.infoTask} <i class="bi bi-arrow-right-square-fill"></i> <em>${task.inputTime}</em> <i class="bi bi-clock-fill"></i></strong>
+        `;
+        } else {
+            infoTask.innerHTML = `
             <strong>${task.inputDay} <i class="bi bi-arrow-right-circle-fill"></i> ${task.infoTask}</strong>
         `;
+        } 
+        
 
         //Creacion del boton eliminar
         const buttonDelete = document.createElement("button");
@@ -49,16 +61,21 @@ const renderizarTareas = () => {
                 title: "¿Estás seguro que quieres eliminar la tarea?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Sí"
+                confirmButtonColor: "#d33", 
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Eliminar"
             }).then((result) => {
                 if (result.isConfirmed) {
                     deleteTask(task.id); 
-                    Swal.fire({
-                        title: "¡Tarea eliminada!",
-                        icon: "success"
-                    });
+                    Toastify({
+                        text: "Has eliminado la tarea",
+                        className: "success",
+                        duration: 1500,
+                        position: "center",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        }
+                    }).showToast();
                 }
             });
         });
@@ -77,7 +94,7 @@ const renderizarTareas = () => {
 
     const buttonDeleteEverything = document.createElement("button");
     buttonDeleteEverything.textContent = "Eliminar todo";
-    buttonDeleteEverything.classList.add("btn", "btn-danger", "btn-sm");
+    buttonDeleteEverything.classList.add("btn", "btn-danger", "btn-md");
     buttonDeleteEverything.style.width = "auto";
     buttonDeleteEverything.addEventListener("click", (event) => {
         event.preventDefault();
@@ -85,19 +102,24 @@ const renderizarTareas = () => {
             title: "¿Estás seguro que quieres eliminar todas las tareas realizadas?",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
             confirmButtonText: "Eliminar todo",
-            cancelButtonText: "Cancelar"
         }).then((result) => {
-            //tasks.filter(task => task.completed)
             if (result.isConfirmed) {
                 const tareasRestantes = tasks.filter(task => !task.completed);
-            tasks.length = 0;
-            tasks.push(...tareasRestantes); // Rellenar con las tareas no completadas
-            localStorage.setItem("tasks", JSON.stringify(tasks)); // Actualizar en localStorage
-            
-            renderizarTareas(); // Renderizar lista actualizada
+                tasks.length = 0;
+                tasks.push(...tareasRestantes); // Rellenar con las tareas no completadas
+                localStorage.setItem("tasks", JSON.stringify(tasks)); // Actualizar en localStorage
+                Toastify({
+                    text: "Has eliminado todas las tareas realizadas",
+                    className: "success",
+                    duration: 1500,
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
             }
         })
     });
@@ -108,7 +130,9 @@ const renderizarTareas = () => {
 
 const addTasks = () => {
     const name = inputTask.value.trim();
-    const day = inputDay.value;
+    const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    const day = inputDay.value.trim();
+    const time = inputTime.value.trim();
 
     if (!name || !day) {
         Swal.fire({
@@ -131,14 +155,16 @@ const addTasks = () => {
     const newTask = {
         id: nextId++,
         inputDay: day,
-        infoTask: name,
+        infoTask: formattedName,
+        inputTime: time,
         completed: false,
     };
     tasks.push(newTask);
     localStorage.setItem("tasks", JSON.stringify(tasks));
     renderizarTareas();
     inputDay.value = ""; // Limpiar el campo de selección después de agregar la tarea
-    inputTask.value = ""; // Limpiar el campo de entrada después de agregar la tarea
+    inputTask.value = ""; 
+    inputTime.value = "";
 };
 
 const deleteTask = (id) => {

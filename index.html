@@ -18,12 +18,12 @@
     </header>
     <form class="form">
       <div class="container">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="tareaPerdiente" class="form-label">Tarea pendiente:</label>
           <input type="tarea" class="form-control" id="inputTask"
           placeholder="Escribe aqui la tarea...">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <label for="inputDay" class="form-label">Dia a realizar la tarea</label>
           <select id="inputDay" class="form-select">
             <option>Lunes</option>
@@ -34,6 +34,10 @@
             <option>Sábado</option>
             <option>Domingo</option>
           </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Hora a realizar la tarea (opcional)</label>
+          <input class="form-control" type="time" id="inputTime" />
         </div>
         <button class="btn btn-warning" id="addTask">Agregar</button>
       </form>
