@@ -7,6 +7,32 @@ const pendingTask = document.getElementById("pendingTask");
 
 const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
+const fetchTasks = async () => {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos');
+        const data = await response.json();
+
+        // Solo cargar las primeras 10 tareas para evitar demasiada información
+        tasks.length = 0; // Vaciar la lista actual
+        data.slice(0, 10).forEach(task => {
+            tasks.push({
+                id: task.id,
+                inputDay: "Lunes", // JSONPlaceholder no tiene días específicos, puedes asignar uno por defecto
+                infoTask: task.title.charAt(0).toUpperCase() + task.title.slice(1),
+                inputTime: "12:00", // Puedes usar un valor por defecto
+                completed: task.completed
+            });
+        });
+        renderizarTareas();
+    } catch (error) {
+        console.error('Error al obtener tareas:', error);
+    }
+};
+
+// Llamar esta función al iniciar
+fetchTasks();
+
+
 let nextId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
 
 const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado", "Domingo"];
@@ -132,7 +158,7 @@ const renderizarTareas = () => {
     completedTaskList.append(buttonDeleteEverything);
 };
 
-const addTasks = () => {
+const addTasks = async () => {
     const name = inputTask.value.trim();
     const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
     const day = inputDay.value.trim();
@@ -157,27 +183,44 @@ const addTasks = () => {
         return; // Detener la ejecución para evitar que la tarea se agregue
     };
     const newTask = {
-        id: nextId++,
-        inputDay: day,
-        infoTask: formattedName,
-        inputTime: time,
-        completed: false,
+        title: formattedName,
+        completed: false
     };
-    tasks.push(newTask);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    renderizarTareas();
-    inputDay.value = ""; // Limpiar el campo de selección después de agregar la tarea
-    inputTask.value = ""; 
-    inputTime.value = "";
+
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTask)
+        });
+        const data = await response.json();
+
+        tasks.push({
+            id: data.id,
+            inputDay: day,
+            infoTask: formattedName,
+            inputTime: time,
+            completed: data.completed
+        });
+        renderizarTareas();
+        inputDay.value = ""; // Limpiar el campo de selección después de agregar la tarea
+        inputTask.value = ""; 
+        inputTime.value = "";
+    } catch (error) {
+        console.error('Error al agregar tarea:', error);
+    }
 };
 
-const deleteTask = (id) => {
-    const index = tasks.findIndex((task) => task.id === id);
-  
-    if (index !== -1) {
-      tasks.splice(index, 1);
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-      renderizarTareas();
+const deleteTask = async (id) => {
+    try {
+        await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, { method: 'DELETE' });
+        const index = tasks.findIndex(task => task.id === id);
+        if (index !== -1) {
+            tasks.splice(index, 1);
+            renderizarTareas();
+        }
+    } catch (error) {
+        console.error('Error al eliminar tarea:', error);
     }
 };
   
@@ -191,13 +234,19 @@ const showPendingTask = () => {
     completedTaskHeader.textContent = `Tareas realizadas: ${completed}`;
 };
   
-const markAsCompleted = (checkbox, id) => {
+const markAsCompleted = async (checkbox, id) => {
     const task = tasks.find((task) => task.id === id);
   
     if (task) {
-        if (checkbox.checked) {
-            task.completed = checkbox.checked;
-            localStorage.setItem("tasks", JSON.stringify(tasks));
+        task.completed = checkbox.checked;
+
+        try {
+            await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: task.completed })
+            });
+            renderizarTareas();
             
             Toastify({
                 text: "Has marcado la tarea como realizada",
@@ -206,27 +255,43 @@ const markAsCompleted = (checkbox, id) => {
                 gravity: "top",
                 position: "right",
                 style: {
-                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    background: task.completed
+                        ? "linear-gradient(to right, #00b09b, #96c93d)"
+                        : "linear-gradient(to right, #ff5f6d, #ffc371)"
                 }
             }).showToast();
-        } else {
-            task.completed = false;
-            localStorage.setItem("tasks", JSON.stringify(tasks));
+        } catch (error) {
+            console.error('Error al actualizar tarea:', error);
+        }
             
-            Toastify({
-                text: "Has marcado la tarea como pendiente",
-                className: "warning",
-                duration: 2000,
-                gravity: "top",
-                position: "right",
-                style: {
-                    background: "linear-gradient(to right, #ff5f6d, #ffc371)",
-                }
-            }).showToast();
-        };
+            // Toastify({
+            //     text: "Has marcado la tarea como pendiente",
+            //     className: "warning",
+            //     duration: 2000,
+            //     gravity: "top",
+            //     position: "right",
+            //     style: {
+            //         background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+            //     }
+            // }).showToast();
     };
     renderizarTareas();
 };
+
+const deleteCompletedTasks = async () => {
+    const completedTasks = tasks.filter(task => task.completed);
+
+    try {
+        await Promise.all(completedTasks.map(task =>
+            fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, { method: 'DELETE' })
+        ));
+        tasks = tasks.filter(task => !task.completed);
+        renderizarTareas();
+    } catch (error) {
+        console.error('Error al eliminar tareas completadas:', error);
+    }
+};
+
   
 renderizarTareas();
 addTaskButton.addEventListener("click", (event) => {
