@@ -236,7 +236,7 @@ const showPendingTask = () => {
   
 const markAsCompleted = async (checkbox, id) => {
     const task = tasks.find((task) => task.id === id);
-  
+
     if (task) {
         task.completed = checkbox.checked;
 
@@ -247,36 +247,38 @@ const markAsCompleted = async (checkbox, id) => {
                 body: JSON.stringify({ completed: task.completed })
             });
             renderizarTareas();
-            
-            Toastify({
-                text: "Has marcado la tarea como realizada",
-                className: "success",
-                duration: 2000,
-                gravity: "top",
-                position: "right",
-                style: {
-                    background: task.completed
-                        ? "linear-gradient(to right, #00b09b, #96c93d)"
-                        : "linear-gradient(to right, #ff5f6d, #ffc371)"
-                }
-            }).showToast();
+
+            // Mostrar mensaje diferente dependiendo del estado de la tarea
+            if (task.completed) {
+                Toastify({
+                    text: "Has marcado la tarea como realizada",
+                    className: "success",
+                    duration: 2000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }
+                }).showToast();
+            } else {
+                Toastify({
+                    text: "Has marcado la tarea como pendiente",
+                    className: "warning",
+                    duration: 2000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    }
+                }).showToast();
+            }
         } catch (error) {
             console.error('Error al actualizar tarea:', error);
         }
-            
-            // Toastify({
-            //     text: "Has marcado la tarea como pendiente",
-            //     className: "warning",
-            //     duration: 2000,
-            //     gravity: "top",
-            //     position: "right",
-            //     style: {
-            //         background: "linear-gradient(to right, #ff5f6d, #ffc371)",
-            //     }
-            // }).showToast();
-    };
+    }
     renderizarTareas();
 };
+
 
 const deleteCompletedTasks = async () => {
     const completedTasks = tasks.filter(task => task.completed);
