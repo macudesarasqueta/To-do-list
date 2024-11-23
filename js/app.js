@@ -9,6 +9,23 @@ const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
 let nextId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
 
+// const fetchTasks = async () => {
+//     try {
+//         const response = await fetch('https://jsonplaceholder.typicode.com/todos');
+//         const data = await response.json();
+//         tasks = data.slice(0, 10).map(task => ({
+//             id: task.id,
+//             inputDay: "Lunes", // Valor predeterminado porque JSONPlaceholder no tiene día
+//             infoTask: task.title.charAt(0).toUpperCase() + task.title.slice(1),
+//             inputTime: "12:00", // Valor predeterminado
+//             completed: task.completed
+//         }));
+//         renderizarTareas();
+//     } catch (error) {
+//         console.error('Error al obtener tareas:', error);
+//     }
+// };
+
 const saveTask = async (newTask) => {
     try {
         const response = await fetch('https://jsonplaceholder.typicode.com/todos', {
@@ -24,6 +41,8 @@ const saveTask = async (newTask) => {
         console.error('Error al guardar tarea:', error);
     }
 };
+
+// fetchTasks();
 
 const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
@@ -151,7 +170,7 @@ const addTasks = async () => {
     const day = inputDay.value.trim();
     const time = inputTime.value.trim();
 
-    if (!name || !day) {
+    if (!formattedName || !day) {
         Swal.fire({
             title: "Por favor rellena todos los campos",
             icon: "error",
@@ -159,7 +178,7 @@ const addTasks = async () => {
         return;
     };
     // Verifica si ya existe una tarea en ese día con el mismo nombre
-    const existingTask = tasks.find(task => task.inputDay === day && task.infoTask === name);
+    const existingTask = tasks.find(task => task.inputDay === day && task.infoTask === formattedName);
     if (existingTask) {
         Swal.fire({
             title: "Tarea duplicada",
