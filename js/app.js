@@ -127,8 +127,10 @@ const renderizarTareas = () => {
     buttonDeleteEverything.textContent = "Eliminar todo";
     buttonDeleteEverything.classList.add("btn", "btn-danger", "btn-md");
     buttonDeleteEverything.style.width = "auto";
-    buttonDeleteEverything.addEventListener("click", (event) => {
+
+    buttonDeleteEverything.addEventListener("click", async (event) => {
         event.preventDefault();
+
         Swal.fire({
             title: "¿Estás seguro que quieres eliminar todas las tareas realizadas?",
             icon: "warning",
@@ -136,30 +138,52 @@ const renderizarTareas = () => {
             confirmButtonColor: "#d33",
             cancelButtonColor: "#3085d6",
             confirmButtonText: "Eliminar todo",
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                // Filtrar las tareas no completadas y reasignar al array tasks
-                const remainingTasks = tasks.filter(task => !task.completed);
-                tasks.length = 0;
-                tasks.push(...remainingTasks); // Agregar solo las tareas no completadas
-            
-                // Actualizar el almacenamiento local y la interfaz
-                localStorage.setItem("tasks", JSON.stringify(tasks));
-                renderizarTareas();
+                try {
+                    // Filtrar las tareas completadas
+                    const completedTasks = tasks.filter(task => task.completed);
 
-                Toastify({
-                    text: "Has eliminado todas las tareas realizadas",
-                    className: "success",
-                    duration: 1500,
-                    position: "center",
-                    style: {
-                        background: "linear-gradient(to right, #00b09b, #96c93d)",
-                    }
-                }).showToast();
+                    // Eliminar cada tarea completada en la API
+                    const deletePromises = completedTasks.map(task => 
+                        fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, { method: 'DELETE' })
+                    );
+
+                    // Esperar a que todas las solicitudes de eliminación se completen
+                    await Promise.all(deletePromises);
+
+                    // Actualizar la lista de tareas eliminando las completadas
+                    const remainingTasks = tasks.filter(task => !task.completed);
+                    tasks.length = 0;
+                    tasks.push(...remainingTasks);
+
+                    // Actualizar el almacenamiento local
+                    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+                    // Renderizar la lista actualizada
+                    renderizarTareas();
+
+                    Toastify({
+                        text: "Has eliminado todas las tareas realizadas",
+                        className: "success",
+                        duration: 1500,
+                        position: "center",
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        }
+                    }).showToast();
+                } catch (error) {
+                    console.error('Error al eliminar tareas realizadas:', error);
+                    Swal.fire({
+                        title: "Error",
+                        text: "No se pudieron eliminar algunas tareas. Intenta nuevamente.",
+                        icon: "error",
+                    });
+                }
             }
-        })
+        });
     });
-    
+
     const completedTasksCount = tasks.filter(task => task.completed).length;
 
     if (completedTasksCount === 0) {
@@ -169,7 +193,6 @@ const renderizarTareas = () => {
         buttonDeleteEverything.disabled = false; // Habilita el botón si hay tareas completadas
         buttonDeleteEverything.classList.remove("disabled");
     }
-
 
     showPendingTask();
     completedTaskList.append(buttonDeleteEverything);
@@ -307,23 +330,6 @@ const markAsCompleted = async (checkbox, id) => {
     renderizarTareas();
 };
 
-
-const deleteCompletedTasks = async () => {
-    const completedTasks = tasks.filter(task => task.completed);
-
-    try {
-        await Promise.all(completedTasks.map(task =>
-            fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, { method: 'DELETE' })
-        ));
-        tasks = tasks.filter(task => !task.completed);
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        renderizarTareas();
-    } catch (error) {
-        console.error('Error al eliminar tareas completadas:', error);
-    }
-};
-
-  
 renderizarTareas();
 addTaskButton.addEventListener("click", (event) => {
     event.preventDefault(); // Evita que el formulario recargue la página
