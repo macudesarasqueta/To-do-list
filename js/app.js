@@ -7,39 +7,28 @@ const pendingTask = document.getElementById("pendingTask");
 
 const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-const fetchTasks = async () => {
-    try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/todos');
-        const data = await response.json();
+let nextId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
 
-        // Solo cargar las primeras 10 tareas para evitar demasiada información
-        tasks.length = 0; // Vaciar la lista actual
-        data.slice(0, 10).forEach(task => {
-            tasks.push({
-                id: task.id,
-                inputDay: "Lunes", // JSONPlaceholder no tiene días específicos, puedes asignar uno por defecto
-                infoTask: task.title.charAt(0).toUpperCase() + task.title.slice(1),
-                inputTime: "12:00", // Puedes usar un valor por defecto
-                completed: task.completed
-            });
+const saveTask = async (newTask) => {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/todos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTask)
         });
+        const savedTask = await response.json();
+        tasks.push(savedTask);
+        localStorage.setItem('tasks', JSON.stringify(tasks)); // Guardar en localStorage
         renderizarTareas();
     } catch (error) {
-        console.error('Error al obtener tareas:', error);
+        console.error('Error al guardar tarea:', error);
     }
 };
-
-// Llamar esta función al iniciar
-fetchTasks();
-
-
-let nextId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
 
 const daysOfWeek = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 const renderizarTareas = () => {
     taskList.innerHTML = "";
-
     const completedTaskList = document.getElementById("completedTaskList");
     completedTaskList.innerHTML = "";
 
@@ -106,9 +95,7 @@ const renderizarTareas = () => {
         });
 
         //Añadir elementos al li
-        itemTask.append(checkbox);
-        itemTask.append(infoTask);
-        itemTask.append(buttonDelete);
+        itemTask.append(checkbox, infoTask, buttonDelete);
         
         if (task.completed) {
             completedTaskList.append(itemTask);
@@ -194,14 +181,22 @@ const addTasks = async () => {
             body: JSON.stringify(newTask)
         });
         const data = await response.json();
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+
+        const getNextId = () => {
+            return tasks.length > 0
+                ? Math.max(...tasks.map(task => task.id)) + 1
+                : 1; // Si el arreglo está vacío, comenzamos con ID 1
+        };
 
         tasks.push({
-            id: data.id,
+            id: getNextId(),
             inputDay: day,
             infoTask: formattedName,
             inputTime: time,
             completed: data.completed
         });
+        localStorage.setItem('tasks', JSON.stringify(tasks));
         renderizarTareas();
         inputDay.value = ""; // Limpiar el campo de selección después de agregar la tarea
         inputTask.value = ""; 
@@ -217,6 +212,7 @@ const deleteTask = async (id) => {
         const index = tasks.findIndex(task => task.id === id);
         if (index !== -1) {
             tasks.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
             renderizarTareas();
         }
     } catch (error) {
@@ -246,7 +242,7 @@ const markAsCompleted = async (checkbox, id) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ completed: task.completed })
             });
-            renderizarTareas();
+            localStorage.setItem("tasks", JSON.stringify(tasks));
 
             // Mostrar mensaje diferente dependiendo del estado de la tarea
             if (task.completed) {
@@ -261,6 +257,8 @@ const markAsCompleted = async (checkbox, id) => {
                     }
                 }).showToast();
             } else {
+                task.completed = false;
+                localStorage.setItem("tasks", JSON.stringify(tasks));
                 Toastify({
                     text: "Has marcado la tarea como pendiente",
                     className: "warning",
@@ -275,7 +273,7 @@ const markAsCompleted = async (checkbox, id) => {
         } catch (error) {
             console.error('Error al actualizar tarea:', error);
         }
-    }
+    };
     renderizarTareas();
 };
 
@@ -288,6 +286,7 @@ const deleteCompletedTasks = async () => {
             fetch(`https://jsonplaceholder.typicode.com/todos/${task.id}`, { method: 'DELETE' })
         ));
         tasks = tasks.filter(task => !task.completed);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
         renderizarTareas();
     } catch (error) {
         console.error('Error al eliminar tareas completadas:', error);
