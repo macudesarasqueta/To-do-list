@@ -159,6 +159,17 @@ const renderizarTareas = () => {
             }
         })
     });
+    
+    const completedTasksCount = tasks.filter(task => task.completed).length;
+
+    if (completedTasksCount === 0) {
+        buttonDeleteEverything.disabled = true; // Deshabilita el botón si no hay tareas completadas
+        buttonDeleteEverything.classList.add("disabled");
+    } else {
+        buttonDeleteEverything.disabled = false; // Habilita el botón si hay tareas completadas
+        buttonDeleteEverything.classList.remove("disabled");
+    }
+
 
     showPendingTask();
     completedTaskList.append(buttonDeleteEverything);
