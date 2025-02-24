@@ -13,5 +13,13 @@ This is a simple yet effective To-Do List application built with **React**. The 
 ## Installation
 
 1. Clone the repository to your local machine:
-   ```bash
    git clone https://github.com/yourusername/to-do-list.git
+
+2. Navigate to the project folder:
+    cd to-do-list
+
+3. Install the dependencies:
+    npm install
+
+4. Start the development server:
+    npm run dev
