@@ -6,12 +6,12 @@ This is a simple yet effective To-Do List application built with React. The app 
 ```
 to-do-list/
 │── css/ 
-│   ├── styles.css/ # Reusable 
-│── images/          
-│── js/             # Source code
-│   ├── app.js/     # Reusable components
-│── .gitignore      # Ignored files
-│── README.md       # Project documentation
+│   ├── styles.css    # Global styles
+│── images/           # Image assets
+│── js/               # JavaScript files
+│   ├── app.js        # Main app logic
+│── .gitignore        # Ignored files
+│── README.md         # Project documentation
 
 ```
 
