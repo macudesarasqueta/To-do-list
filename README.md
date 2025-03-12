@@ -1,25 +1,63 @@
 # To-Do List App
 
-This is a simple yet effective To-Do List application built with **React**. The app allows users to manage their tasks with ease by providing features like adding, editing, and deleting tasks. It also includes a clean and user-friendly interface, along with local storage support, so your tasks persist even after a page refresh.
+This is a simple yet effective To-Do List application built with React. The app allows users to manage their tasks with ease, including adding, editing, and deleting tasks. It also supports marking tasks as completed and ensures persistence across page refreshes with local storage.
+
 
 ## Features
-- **Create tasks**: Add new tasks to your list.
-- **Edit tasks**: Modify tasks as needed.
-- **Delete tasks**: Remove tasks that are no longer needed.
-- **Mark tasks as completed**: Check off tasks as you complete them.
-- **Responsive design**: The app is optimized for both desktop and mobile devices.
-- **Local storage**: Tasks persist even after refreshing the page.
 
-## Installation
+- Add, edit, and delete tasks
+- Mark tasks as completed
+- Responsive design (optimized for both desktop and mobile)
+- Tasks persist using local storage
 
-1. Clone the repository to your local machine:
-   git clone https://github.com/yourusername/to-do-list.git
+## 📂 Project Structure
+```
+to-do-list/
+│── css/ 
+│   ├── styles.css/  # Reusable 
+│── images/          
+│── js/             # Source code
+│   ├── app.js/  # Reusable components
+│── .gitignore       # Ignored files
+│── README.md        # Project documentation
 
-2. Navigate to the project folder:
-    cd to-do-list
+```
 
-3. Install the dependencies:
-    npm install
+## 🎨 Features
 
+- Interactive UI showcasing projects and skills
+- Responsive design for mobile and desktop
+- Contact form for inquiries
+- Smooth animations and transitions
+
+## 📌 How to Run the Project
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/macudesarasqueta/To-do-list.git
+   ```
+2. Navigate to the project directory:
+   ```sh
+   cd to-do-list
+   ```
+3. Install dependencies:
+   ```sh
+   npm install
+   ```
 4. Start the development server:
-    npm run dev
+   ```sh
+   npm start
+   ```
+
+## 🌐 Live Demo
+You can try out the live version [http://to-do-list-weekly.vercel.app](#).
+
+## 🤝 Contributing
+Feel free to open issues or submit pull requests if you find any improvements!
+
+## 📧 Contact
+For any inquiries, reach out via email or connect with me on [https://www.linkedin.com/in/macarena-de-sarasqueta-szneiderowicz-62a80322b/](#).
+
+---
+
+⭐ Don't forget to star the repo if you like it!
