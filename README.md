@@ -1,6 +1,6 @@
 # To-Do List App
 
-This is a simple yet effective To-Do List application built with React. The app allows users to manage their tasks with ease, including adding, editing, and deleting tasks. It also supports marking tasks as completed and ensures persistence across page refreshes with local storage.
+This is a simple yet effective To-Do List application. The app allows users to manage their tasks with ease, including adding, editing, and deleting tasks. It also supports marking tasks as completed and ensures persistence across page refreshes with local storage.
 
 ## 📂 Project Structure
 ```
