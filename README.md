@@ -2,33 +2,27 @@
 
 This is a simple yet effective To-Do List application built with React. The app allows users to manage their tasks with ease, including adding, editing, and deleting tasks. It also supports marking tasks as completed and ensures persistence across page refreshes with local storage.
 
+## 📂 Project Structure
+```
+to-do-list/
+│── css/ 
+│   ├── styles.css/ # Reusable 
+│── images/          
+│── js/             # Source code
+│   ├── app.js/     # Reusable components
+│── .gitignore      # Ignored files
+│── README.md       # Project documentation
 
-## Features
+```
+
+## 🎨 Features
 
 - Add, edit, and delete tasks
 - Mark tasks as completed
 - Responsive design (optimized for both desktop and mobile)
 - Tasks persist using local storage
 
-## 📂 Project Structure
-```
-to-do-list/
-│── css/ 
-│   ├── styles.css/  # Reusable 
-│── images/          
-│── js/             # Source code
-│   ├── app.js/  # Reusable components
-│── .gitignore       # Ignored files
-│── README.md        # Project documentation
 
-```
-
-## 🎨 Features
-
-- Interactive UI showcasing projects and skills
-- Responsive design for mobile and desktop
-- Contact form for inquiries
-- Smooth animations and transitions
 
 ## 📌 How to Run the Project
 
